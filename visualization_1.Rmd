@@ -1,0 +1,34 @@
+---
+title: "visualization_1"
+author: "Amrutha Banda"
+output: github_document
+date: "2025-09-25"
+---
+
+
+```{r}
+library(tidyverse)
+library(ggridges)
+library(p8105.datasets)
+data("weather_df")
+```
+
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))
+```
+
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
+
+creates the same scatterplot byt included piping 
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
