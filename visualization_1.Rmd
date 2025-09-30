@@ -6,29 +6,255 @@ date: "2025-09-25"
 ---
 
 
-```{r}
+```{r setup, include=FALSE}
 library(tidyverse)
 library(ggridges)
 library(p8105.datasets)
+```
+
+import the weather data
+```{r}
 data("weather_df")
 ```
 
-
+Making out first plot
 ```{r}
 ggplot(weather_df, aes(x = tmin, y = tmax))
 ```
 
 
 ```{r}
-ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+ggplot(weather_df, mapping= aes(x = tmin, y = tmax)) + 
   geom_point()
 ```
 
 
-creates the same scatterplot byt included piping 
+creates the same scatterplot but included piping 
 ```{r}
 weather_df |>
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point()
+```
+
+will be shown in environment 
+```{r}
+ggp_weather_scatterplot=
+  weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+
+ggp_weather_scatterplot
+```
+
+check that some rows are missing 
+```{r}
+weather_df |> 
+ filter(is.na(tmax))
+
+```
+
+
+## Fancier scatterplots 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, y=tmax, color=name)) + 
+  geom_point(alpha= 0.3) +
+  geom_smooth(se= FALSE)
+
+```
+
+
+Where you define aesthetics can matter 
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color=name, size= prcp), alpha = 0.3) +
+  geom_smooth(se = FALSE) 
+
+```
+
+use faceting real quick 
+ˆ
+```{r}
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color=name), alpha=0.3, size=0.8) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color=name), alpha=0.3, size=0.8) +
+  geom_smooth(se = FALSE) +
+  facet_grid(name ~. )
+
+```
+
+Let's make a somehwta more interesting scatterplot
+
+```{r}
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color=name)) + 
+  geom_point(aes(size=prcp), alpha=0.3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+  
+```
+
+
+Learning Assessment: Write a code chain that starts with weather_df; focuses only on Central Park, converts temperatures to Fahrenheit, makes a scatterplot of min vs. max temperature, and overlays a linear regression line (using options in geom_smooth())
+
+LA plot: 
+
+whenever we create something new we use `mutate`
+`se= FALSE` removes the error band 
+
+```{r}
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  mutate(
+    tmax_fahr= tmax * (9/5) +32, 
+    tmin_fahr= tmin * (9/5) +32
+  ) |> 
+  ggplot(aes(x = tmin_fahr, y = tmax_fahr)) + 
+  geom_point() +
+  geom_smooth(se= FALSE, method= "lm")
+```
+
+## Small Things 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y=tmax, color=name, shape=name)) + 
+# geom_point(alpha=0.3) +
+  geom_smooth(se= FALSE)
+
+weather_df |> 
+  ggplot(aes(x = tmin, y=tmax, color=name, shape=name)) +
+  geom_smooth(se= FALSE) +
+  geom_point()
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, y=tmax)) +
+  geom_hex()
+
+```
+
+
+```{r}
+
+weather_df |> 
+  ggplot(aes(x=tmin, y=tmax)) +
+  geom_point(color="#098")
+```
+
+## Univariate plots 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin)) +
+  geom_histogram(color= "white", fill= "red")
+
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, color=name)) +
+  geom_histogram()
+
+weather_df |> 
+  ggplot(aes(x=tmin, fill=name)) +
+  geom_histogram()
+
+
+```
+
+How would I fix this? Maybe facet?
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, fill=name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+```
+
+Make a density plot?
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, fill=name)) +
+  geom_density(alpha=0.2) 
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=name, y=tmin)) +
+  geom_boxplot(aes(fill=name))
+```
+
+
+violin plots 
+
+```{r}
+
+weather_df |> 
+  ggplot(aes(x=name, y=tmin, fill=name)) +
+  geom_violin()
+
+```
+
+ridge plot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, y=name)) +
+  geom_density_ridges()
+```
+
+
+Learning Assessment: Make plots that compare precipitation across locations. Try a histogram, a density plot, a boxplot, a violin plot, and a ridgeplot; use aesthetic mappings to make your figure readable
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=prcp, fill=name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+
+```
+
+```{r}
+weather_df |> 
+  filter(prcp > 5, prcp<1000) |> 
+  ggplot(aes(x=prcp, fill=name)) +
+  geom_density(alpha=0.3)
+```
+
+```{r}
+
+ggp_weather_violin= 
+  weather_df |> 
+  ggplot(aes(x=name, y=tmin, fill=name)) +
+  geom_violin()
+
+ggp_weather_violin
+
+ggsave("plots/violin_plot.pdf", ggp_weather_violin, 
+       width=8, height=6)
+```
+
+
+## Saving and embedding plots
+
+embedding plots
+```{r, fig.width=6, fig.height=4}
+
+ggp_weather_violin
 ```
 
