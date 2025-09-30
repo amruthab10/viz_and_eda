@@ -1,0 +1,57 @@
+---
+title: "visualization_2"
+author: "Amrutha Banda"
+date: "2025-09-30"
+output: github_document
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(patchwork)
+library(p8105.datasets)
+```
+
+
+Import the weatehr data
+```{r}
+data("weather_df")
+```
+
+Lets make out basic  scatterplot
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) +
+  labs(
+    x= "Minimum daily temp", 
+    y= "Maximum daily temp", 
+    title= "Temperature Scatterplot", 
+    caption= "Data from NOAA", 
+    color= "Location"
+  )
+```
+
+
+## Scales
+
+
+breaks changes the scale on the scatterplot
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) +
+  labs(
+    x= "Minimum daily temp", 
+    y= "Maximum daily temp", 
+    title= "Temperature Scatterplot", 
+    caption= "Data from NOAA", 
+    color= "Location" 
+)+ 
+  scale_x_continuous(
+    breaks = c(-20, 0, 25), 
+    labels = c("-25º C", "0", "25"))
+```
+
+
+
